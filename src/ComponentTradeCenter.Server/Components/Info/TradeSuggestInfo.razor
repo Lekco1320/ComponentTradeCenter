@@ -1,0 +1,17 @@
+﻿@inherits EntityInfoBase<TradeSuggest>
+@using ComponentTradeCenter.Server.Components.Base
+@using ComponentTradeCenter.Server.Data.Model
+
+<div class="dropdown-item-demo">
+    <div class="select-custom-header">
+        <div class="id">@Value?.CustomId</div>
+        <div class="name">@Value?.Name</div>
+    </div>
+    <div class="select-custom-body">
+        <div>@($"收购ID：{Need.GetCustomId(Value?.NeedId)}")</div>
+        <div>@($"出售ID：{Supply.GetCustomId(Value?.SupplyId)}")</div>
+        <div>@($"交易员ID：{Trader.GetCustomId(Value?.TraderId)}")</div>
+        <div>@($"报价：{Value?.Price:C2}")</div>
+        <div>@($"数量：{Value?.Amount}")</div>
+    </div>
+</div>

@@ -1,0 +1,13 @@
+﻿@inherits EntityInfoBase<Agreement>
+@using ComponentTradeCenter.Server.Data.Model
+@using ComponentTradeCenter.Server.Components.Base
+
+<div class="dropdown-item-demo">
+    <div class="select-custom-header">
+        <div class="id">@Value?.CustomId</div>
+        <div class="name">@Value?.Name</div>
+    </div>
+    <div class="select-custom-body">
+        <div>@($"交易建议：{TradeSuggest.GetCustomId(Value?.SuggestId)}")</div>
+    </div>
+</div>

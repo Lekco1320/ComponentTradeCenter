@@ -1,0 +1,15 @@
+﻿@inherits EntityInfoBase<Need>
+@using ComponentTradeCenter.Server.Components.Base
+@using ComponentTradeCenter.Server.Data.Model
+
+<div class="dropdown-item-demo">
+    <div class="select-custom-header">
+        <div class="id">@Value?.CustomId</div>
+        <div class="name">@Value?.Name</div>
+    </div>
+    <div class="select-custom-body">
+        <div>@($"顾客ID：{Need.GetCustomId(Value?.CustomerId)}")</div>
+        <div>@($"预算：{Value?.Price:C2}")</div>
+        <div>@($"数量：{Value?.Amount}")</div>
+    </div>
+</div>

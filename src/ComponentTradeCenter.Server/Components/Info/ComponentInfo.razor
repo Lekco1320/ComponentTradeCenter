@@ -1,0 +1,15 @@
+﻿@inherits EntityInfoBase<Component>
+@using ComponentTradeCenter.Server.Components.Base
+@using Component = ComponentTradeCenter.Server.Data.Model.Component
+
+<div class="dropdown-item-demo">
+    <div class="select-custom-header">
+        <div class="id">@Value?.CustomId</div>
+        <div class="name">@Value?.Name</div>
+    </div>
+    <div class="select-custom-body">
+        <div>@($"颜色：{Value?.Color}")</div>
+        <div>@($"重量：{Value?.Weight} g")</div>
+        <div>@($"简介：{Value?.Brief}")</div>
+    </div>
+</div>

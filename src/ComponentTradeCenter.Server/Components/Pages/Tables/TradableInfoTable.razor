@@ -1,0 +1,66 @@
+﻿@page "/tradable-info-table"
+@layout MainLayout
+@inherits EntityTablePageBase<TradableInfo>
+@using ComponentTradeCenter.Server.Data.Base
+@using ComponentTradeCenter.Server.Data.Model
+@using ComponentTradeCenter.Server.Data.ViewModel
+@using ComponentTradeCenter.Server.Components.Base
+
+<Table TItem="TradableInfo" class="table-demo" PageItemsSource="@PageItemsSource"
+       IsPagination="true" IsStriped="true" IsBordered="true" IsMultipleSelect="true" 
+       ShowAdvancedSearch="false" ShowToolbar="true" ShowSearch="true" 
+       ShowExportPdfButton="true" ShowExportButton="true"
+       ShowEditButton="false" ShowDeleteButton="false" ShowAddButton="false"
+       OnQueryAsync="@OnQueryAsync">
+
+    <TableColumns>
+        <TableColumn Text="ID" @bind-Field="@context.Id" />
+        <TableColumn Text="零件" @bind-Field="@context.ComponentName" Searchable="true" />
+        <TableColumn Text="收购ID" @bind-Field="@context.NeedId" Formatter="@(GetModelCustomId<Need>)" />
+        <TableColumn Text="收购名称" @bind-Field="@context.NeedName" />
+        <TableColumn Text="收购预算" @bind-Field="@context.NeedPrice" FormatString="C2" Filterable="true" />
+        <TableColumn Text="收购数量" @bind-Field="@context.NeedAmount" FormatString="N0" Filterable="true" />
+        <TableColumn Text="出售ID" @bind-Field="@context.SupplyId" Formatter="@(GetModelCustomId<Supply>)" />
+        <TableColumn Text="出售名称" @bind-Field="@context.SupplyName" />
+        <TableColumn Text="出售报价" @bind-Field="@context.SupplyPrice" FormatString="C2" Filterable="true" />
+        <TableColumn Text="出售数量" @bind-Field="@context.SupplyAmount" FormatString="N0" Filterable="true" />
+        <TableColumn Text="操作" @bind-Field="context.Id" Ignore="@(User is not Trader)">
+            <Template Context="v">
+                <Button Color="Color.Primary" Text="提出交易建议" Size="Size.ExtraSmall" OnClick="@(() => NewTradeSuggest(v.Row))" />
+            </Template>
+        </TableColumn>
+    </TableColumns>
+
+</Table>
+
+<Modal @ref="Modal">
+    <ModalDialog Title="提出交易建议" IsCentered="true">
+        <BodyTemplate>
+            <ValidateForm Model="@TradeSuggest">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <BootstrapInput DisplayText="名称" @bind-Value="@TradeSuggest.Name" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <BootstrapInput DisplayText="零件名" Value="@ComponentName" IsDisabled="true" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <BootstrapInput DisplayText="收购ID" Value="@Need.GetCustomId(TradeSuggest.NeedId)" IsDisabled="true" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <BootstrapInput DisplayText="出售ID" Value="@Supply.GetCustomId(TradeSuggest.SupplyId)" IsDisabled="true" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <BootstrapInput DisplayText="报价" @bind-Value="@TradeSuggest.Price" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <BootstrapInput DisplayText="数量" @bind-Value="@TradeSuggest.Amount" />
+                    </div>
+                </div>
+            </ValidateForm>
+        </BodyTemplate>
+        <FooterTemplate>
+            <Button Text="确定" Icon="fa-regular fa-square-check" OnClick="@OnModalConfirm" />
+        </FooterTemplate>
+    </ModalDialog>
+</Modal>

@@ -1,0 +1,52 @@
+﻿@inherits LayoutComponentBase
+@using ComponentTradeCenter.Server.Data.Base
+
+<CascadingValue Value="this">
+    <BootstrapBlazorRoot>
+        <Layout ShowGotoTop="false" ShowFooter="true" SideWidth="0" IsPage="true"
+                IsFullSide="false" IsFixedHeader="true" IsFixedFooter="true"
+                TabDefaultUrl="/login" AdditionalAssemblies="@(new[] { GetType().Assembly })"
+                Menus="@Menus">
+            <Header>
+                <Avatar IsBorder="true" Url="images/component.png" IsCircle="true" Size="Size.Small" />
+                <span class="ms-2 flex-sm-fill d-none d-sm-block" style="color: white;">
+                    <strong>零件交易中心</strong>
+                </span>
+                <div class="flex-fill d-sm-none" />
+                <Logout ImageUrl="images/user.png" DisplayName="@User?.Name" UserName="@(((ICustomIdProvider?)User)?.CustomId)"
+                        PrefixDisplayNameText="欢迎," PrefixUserNameText="ID:">
+                    <LinkTemplate>
+                        <a href="#"><i class="fa-solid fa-suitcase"></i>个人中心</a>
+                        <LogoutLink Text="登出/注销" Url="@($"/person-center?customid={((ICustomIdProvider?)User)?.CustomId ?? ""}")" />
+                    </LinkTemplate>
+                </Logout>
+            </Header>
+            <Side>
+                <div class="layout-banner">
+                    <div class="layout-title">
+                        <span>零件交易中心</span>
+                    </div>
+                </div>
+            </Side>
+            <Main>
+                <CascadingValue Value="this" IsFixed="true">
+                    @Body
+                </CascadingValue>
+            </Main>
+            <Footer>
+                <div class="text-center flex-fill">
+                    <span class="text-center">Developed by Lukaß Zhang</span>
+                </div>
+            </Footer>
+            <NotFound>
+                <Error />
+            </NotFound>
+        </Layout>
+    </BootstrapBlazorRoot>
+</CascadingValue>
+
+<div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>

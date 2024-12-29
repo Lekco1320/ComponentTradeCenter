@@ -1,0 +1,13 @@
+﻿@inherits EntitySelectBase<Component>
+@using ComponentTradeCenter.Server.Data.Model
+@using ComponentTradeCenter.Server.Components.Base
+@using ComponentTradeCenter.Server.Components.Info
+@using Component = ComponentTradeCenter.Server.Data.Model.Component
+
+<div class="col-12 col-sm-6">
+    <Select @bind-Value="@InternalValue" Items="@Items.Keys" DisplayText="零件">
+        <ItemTemplate Context="v">
+            <ComponentInfo Value="@Items[v]" />
+        </ItemTemplate>
+    </Select>
+</div>

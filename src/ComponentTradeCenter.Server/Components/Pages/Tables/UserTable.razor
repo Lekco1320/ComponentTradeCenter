@@ -1,0 +1,35 @@
+﻿@page "/user-table"
+@layout MainLayout
+@inherits EntityTablePageBase<UserInfo>
+@using ComponentTradeCenter.Server.Data.ViewModel
+@using ComponentTradeCenter.Server.Components.Base
+
+<PageTitle>用户信息</PageTitle>
+
+<Table TItem="UserInfo" class="table-demo" PageItemsSource="@PageItemsSource"
+       IsPagination="true" IsStriped="true" IsBordered="true" IsMultipleSelect="true"
+       ShowAdvancedSearch="false" ShowToolbar="true" ShowSearch="true"
+       ShowExportButton="true" ShowExportPdfButton="true"
+       ShowAddButton="false" ShowEditButton="false" ShowDeleteButton="false"
+       OnQueryAsync="@OnQueryAsync">
+
+    <TableColumns>
+        <TableColumn Text="ID" @bind-Field="@context.Id" Searchable="true" Readonly="true"
+                     IsVisibleWhenEdit="false" IsVisibleWhenAdd="false" />
+        <TableColumn Text="用户ID" @bind-Field="@context.UserId" Searchable="true" Readonly="true"
+                     Formatter="@GetModelCustomId" IsVisibleWhenEdit="false" IsVisibleWhenAdd="false" />
+        <TableColumn Text="姓名" @bind-Field="@context.Name" Searchable="true" />
+        <TableColumn Text="电话" @bind-Field="@context.Phone">
+            <Template Context="v">
+                <div>@(v.Row.Phone ?? "无")</div>
+            </Template>
+        </TableColumn>
+        <TableColumn Text="注册时间" @bind-Field="@context.RegisterTime" FormatString="yyyy/MM/dd HH:mm:ss" />
+        <TableColumn Text="注销时间" @bind-Field="@context.DeleteTime">
+            <Template Context="v">
+                <div>@(v.Row.DeleteTime?.ToString("yyyy/MM/dd HH:mm:ss") ?? "未注销")</div>
+            </Template>
+        </TableColumn>
+    </TableColumns>
+
+</Table>

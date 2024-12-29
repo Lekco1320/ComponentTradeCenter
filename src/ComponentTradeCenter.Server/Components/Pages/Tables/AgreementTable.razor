@@ -1,0 +1,158 @@
+﻿@page "/agreement-table"
+@layout MainLayout
+@inherits EntityTablePageBase<AgreementVM>
+@implements IEditableTablePage<AgreementVM>
+@using ComponentTradeCenter.Server.Data.Base
+@using ComponentTradeCenter.Server.Data.Model
+@using ComponentTradeCenter.Server.Data.ViewModel
+@using ComponentTradeCenter.Server.Components.Base
+@using ComponentTradeCenter.Server.Components.Selects
+
+<PageTitle>在途交易</PageTitle>
+
+<Table TItem="AgreementVM" class="table-demo" PageItemsSource="@PageItemsSource"
+       IsPagination="true" IsStriped="true" IsBordered="true" IsMultipleSelect="true"
+       ShowAdvancedSearch="false" ShowToolbar="true" ShowSearch="true"
+       ShowExportPdfButton="true" ShowExportButton="true"
+       ShowAddButton="@IsAddable" ShowEditButton="@IsEditable" ShowDeleteButton="@IsDeleteable" 
+       OnQueryAsync="@OnQueryAsync" OnAddAsync="@OnAddAsync"
+       OnDeleteAsync="@OnDeleteAsync" OnSaveAsync="@OnSaveAsync">
+
+    <TableColumns>
+        <TableColumn Text="ID" @bind-Field="@context.Id" Formatter="@(GetModelCustomId<Agreement>)"
+                     Searchable="true" Readonly="true" IsVisibleWhenEdit="false" IsVisibleWhenAdd="false" />
+        <TableColumn Text="名称" @bind-Field="@context.Name" Searchable="true" />
+        <TableColumn Text="交易建议" @bind-Field="@context.SuggestId" Visible="false"
+                     IsVisibleWhenAdd="true" IsVisibleWhenEdit="true">
+            <EditTemplate Context="v">
+                <TradeSuggestSelect @bind-Value="@v.SuggestId" />
+            </EditTemplate>
+        </TableColumn>
+        <TableColumn Text="收购名称" @bind-Field="@context.NeedName"
+                     IsVisibleWhenAdd="false" IsVisibleWhenEdit="false" />
+        <TableColumn Text="出售名称" @bind-Field="@context.SupplyName"
+                     IsVisibleWhenAdd="false" IsVisibleWhenEdit="false" />
+        <TableColumn Text="交易员" @bind-Field="@context.TraderName"
+                     IsVisibleWhenAdd="false" IsVisibleWhenEdit="false" />
+        <TableColumn Text="零件" @bind-Field="@context.ComponentName"
+                     IsVisibleWhenAdd="false" IsVisibleWhenEdit="false" />
+        <TableColumn Text="价格" @bind-Field="@context.Price" FormatString="C2"
+                     IsVisibleWhenAdd="false" IsVisibleWhenEdit="false" />
+        <TableColumn Text="数量" @bind-Field="@context.Amount" FormatString="N0"
+                     IsVisibleWhenAdd="false" IsVisibleWhenEdit="false" />
+        <TableColumn Text="顾客签名" @bind-Field="@context.CustomerSignature">
+            <Template Context="v">
+                @{
+                    var agreement = v.Row;
+                    bool canUpload = User is Customer && agreement.CustomerSignature == null;
+                }
+                @if (canUpload)
+                {
+                    <ButtonUpload TValue="string" ShowProgress="true" Size="Size.ExtraSmall" IsSingle="true"
+                                  Accept="image/*" OnChange="@(file => OnUploadSign(file, agreement, true))" />
+                }
+                else if (agreement.CustomerSignature == null)
+                {
+                    <Button Color="Color.Secondary" Text="未上传" Size="Size.ExtraSmall" IsDisabled="true" />
+                }
+                else if (agreement.CustomerSignature != null)
+                {
+                    <Button Color="Color.Primary" Text="查看" Size="Size.ExtraSmall"
+                            OnClick="@(() => ShowSignature(agreement.CustomerSignature, "顾客签名"))" />
+                }
+            </Template>
+            <EditTemplate Context="v">
+                <ButtonUpload TValue="string" ShowProgress="true" Size="Size.ExtraSmall" IsSingle="true"
+                              Accept="image/*" DisplayText="顾客签名" OnChange="@(file => OnUploadSign(file, v, true))" />
+            </EditTemplate>
+        </TableColumn>
+        <TableColumn Text="供应商签名" @bind-Field="@context.SupplierSignature">
+            <Template Context="v">
+                @{
+                    var agreement = v.Row;
+                    bool canUpload = User is Supplier && agreement.SupplierSignature == null;
+                }
+                @if (canUpload)
+                {
+                    <ButtonUpload TValue="string" ShowProgress="true" Size="Size.ExtraSmall"
+                                  Accept="image/*" OnChange="@(file => OnUploadSign(file, agreement, false))" />
+                }
+                else if (agreement.SupplierSignature == null)
+                {
+                    <Button Color="Color.Secondary" Text="未上传" Size="Size.ExtraSmall" IsDisabled="true" />
+                }
+                else if (agreement.SupplierSignature != null)
+                {
+                    <Button Color="Color.Primary" Text="查看" Size="Size.ExtraSmall"
+                            OnClick="@(() => ShowSignature(agreement.SupplierSignature, "供应商签名"))" />
+                }
+            </Template>
+            <EditTemplate Context="v">
+                <ButtonUpload TValue="string" ShowProgress="true" Size="Size.ExtraSmall" IsSingle="true"
+                              Accept="image/*" DisplayText="供应商签名" OnChange="@(file => OnUploadSign(file, v, false))" />
+            </EditTemplate>
+        </TableColumn>
+        <TableColumn Text="交易操作" @bind-Field="context.Id"
+                     IsVisibleWhenAdd="false" IsVisibleWhenEdit="false">
+            <Template Context="v">
+                @{
+                    var agreement = v.Row;
+                    bool canTrade = agreement.CustomerSignature != null && agreement.SupplierSignature != null;
+                }
+                <div style="display: flex; justify-content: center; gap: 10px;">
+                    @if (agreement.TraderIntention == null)
+                    {
+                        @if (User is Trader or Administrator)
+                        {
+                            @if (canTrade)
+                            {
+                                <Button Color="Color.Primary" Text="达成协议" Size="Size.ExtraSmall"
+                                        OnClick="@(() => OnCompeleteAgreement(agreement))" />
+                            }
+                            else
+                            {
+                                <Button Color="Color.Secondary" Text="不可达成协议" Size="Size.ExtraSmall"
+                                        IsDisabled="true" />
+                            }
+                            <PopConfirmButton Color="Color.Danger" Text="取消协议" Size="Size.ExtraSmall"
+                                              OnConfirm="@(() => OnDropAgreement(agreement))" />
+                        }
+                        else
+                        {
+                            <Button Color="Color.Secondary" Text="等待交易员审批" Size="Size.ExtraSmall"
+                                    IsDisabled="true" />
+                        }
+                    }
+                    else if (agreement.TraderIntention == true)
+                    {
+                        <Button Color="Color.Secondary" Text="已达成协议" Size="Size.ExtraSmall" IsDisabled="true" />
+                    }
+                    else if (agreement.TraderIntention == false)
+                    {
+                        <Button Color="Color.Secondary" Text="已取消协议" Size="Size.ExtraSmall" IsDisabled="true" />
+                    }
+                </div>
+            </Template>
+        </TableColumn>
+    </TableColumns>
+</Table>
+
+<Modal @ref="Modal">
+    <ModalDialog Title="完成交易" IsCentered="true">
+        <BodyTemplate>
+            <ValidateForm Model="@Trade">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <BootstrapInput DisplayText="名称" @bind-Value="@Trade.Name" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <BootstrapInput DisplayText="协议" Value="@Agreement.GetCustomId(Trade.AgreementId)" IsDisabled="true" />
+                    </div>
+                </div>
+            </ValidateForm>
+        </BodyTemplate>
+        <FooterTemplate>
+            <Button Text="确定" Icon="fa-regular fa-square-check" OnClick="@OnModalConfirm" />
+        </FooterTemplate>
+    </ModalDialog>
+</Modal>

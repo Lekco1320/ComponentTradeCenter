@@ -1,0 +1,22 @@
+﻿@page "/error"
+@inject NavigationManager navigationManager
+@using System.Diagnostics.CodeAnalysis
+
+<h1 class="text-danger">Error:</h1>
+<h2 class="text-danger">@Info</h2>
+
+@code {
+    [NotNull]
+    protected string? Info { get; set; }
+
+    protected override void OnInitialized()
+    {
+        var uri = navigationManager.ToAbsoluteUri(navigationManager.Uri);
+        var queryParams = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+        if (queryParams.TryGetValue("info", out var customId))
+        {
+            Info = customId.ToString();
+            return;
+        }
+    }
+}

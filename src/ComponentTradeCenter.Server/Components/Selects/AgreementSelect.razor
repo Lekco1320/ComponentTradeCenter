@@ -1,0 +1,12 @@
+﻿@inherits EntitySelectBase<Agreement>
+@using ComponentTradeCenter.Server.Data.Model
+@using ComponentTradeCenter.Server.Components.Base
+@using ComponentTradeCenter.Server.Components.Info
+
+<div class="col-12 col-sm-6">
+    <Select @bind-Value="@InternalValue" Items="@Items.Keys" DisplayText="协议">
+        <ItemTemplate Context="v">
+            <AgreementInfo Value="@Items[v]" />
+        </ItemTemplate>
+    </Select>
+</div>

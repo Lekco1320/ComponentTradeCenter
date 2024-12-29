@@ -1,0 +1,41 @@
+﻿@page "/person-center"
+@layout MainLayout
+@inherits OnlineComponentBase
+@using ComponentTradeCenter.Server.Data.Model
+@using ComponentTradeCenter.Server.Components
+@using ComponentTradeCenter.Server.Components.Base
+
+<PageTitle>个人中心</PageTitle>
+
+<ValidateForm Model="@EditModel" OnValidSubmit="@OnConfirmChanges">
+    <GroupBox Title="个人信息" style="margin-top: 1.5rem">
+        <EditorForm TModel="EditUserModel" AutoGenerateAllItem="false">
+            <FieldItems>
+                <EditorItem Text="ID" @bind-Field="@EditModel.CustomId" Readonly="true" />
+                <EditorItem Text="类别" @bind-Field="@EditModel.Category" Readonly="true" />
+                <EditorItem Text="名称" @bind-Field="@EditModel.NewName" />
+                <EditorItem Text="电话" @bind-Field="@EditModel.Phone" />
+                <EditorItem Text="地址" @bind-Field="@EditModel.Address" Ignore="@(User is not (Customer or Supplier))" />
+                <EditorItem Text="更改密码" @bind-Field="@EditModel.NewPassword">
+                    <EditTemplate Context="v">
+                        <div class="col-12 col-sm-6">
+                            <BootstrapPassword DisplayText="更改密码" @bind-Value="@EditModel.NewPassword" PlaceHolder="请输入密码…" />
+                        </div>
+                    </EditTemplate>
+                </EditorItem>
+                <EditorItem Text="确认密码" @bind-Field="@EditModel.NewConfirmPassword">
+                    <EditTemplate Context="v">
+                        <div class="col-12 col-sm-6">
+                            <BootstrapPassword DisplayText="确认密码" @bind-Value="@EditModel.NewConfirmPassword" PlaceHolder="请确认密码…" />
+                        </div>
+                    </EditTemplate>
+                </EditorItem>
+            </FieldItems>
+            <Buttons>
+                <PopConfirmButton Text="提交更改" Color="Color.Success" ButtonType="ButtonType.Submit" />
+                <PopConfirmButton Text="登出" Color="Color.Primary" OnConfirm="@OnConfirmLogout" />
+                <PopConfirmButton Text="注销" Color="Color.Danger" OnConfirm="@OnConfirmLogoff" />
+            </Buttons>
+        </EditorForm>
+    </GroupBox>
+</ValidateForm>

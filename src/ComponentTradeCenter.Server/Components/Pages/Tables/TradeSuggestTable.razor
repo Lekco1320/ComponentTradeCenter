@@ -1,0 +1,168 @@
+﻿@page "/trade-suggest-table"
+@layout MainLayout
+@inherits EntityTablePageBase<TradeSuggestVM>
+@implements IEditableTablePage<TradeSuggestVM>
+@using ComponentTradeCenter.Server.Data.Model
+@using ComponentTradeCenter.Server.Data.ViewModel
+@using ComponentTradeCenter.Server.Components.Base
+@using ComponentTradeCenter.Server.Components.Selects
+
+<PageTitle>交易建议</PageTitle>
+
+<Table TItem="TradeSuggestVM" class="table-demo" PageItemsSource="@PageItemsSource"
+       IsPagination="true" IsStriped="true" IsBordered="true" IsMultipleSelect="true"
+       ShowAdvancedSearch="false" ShowToolbar="true" ShowSearch="true"
+       ShowExportPdfButton="true" ShowExportButton="true"
+       ShowAddButton="@IsAddable" ShowEditButton="@IsEditable" ShowDeleteButton="@IsDeleteable"
+       OnQueryAsync="@OnQueryAsync" OnAddAsync="@OnAddAsync"
+       OnDeleteAsync="@OnDeleteAsync" OnSaveAsync="@OnSaveAsync">
+
+    <TableColumns>
+        <TableColumn Text="ID" @bind-Field="@context.Id" Formatter="@(GetModelCustomId<TradeSuggest>)"
+                     Searchable="true" Readonly="true" IsVisibleWhenEdit="false" IsVisibleWhenAdd="false" />
+        <TableColumn Text="名称" @bind-Field="@context.Name" Searchable="true" />
+        <TableColumn Text="收购名称" @bind-Field="@context.NeedName"
+                     IsVisibleWhenAdd="false" IsVisibleWhenEdit="false" />
+        <TableColumn Text="收购" @bind-Field="@context.NeedId" Visible="false"
+                     IsVisibleWhenAdd="true" IsVisibleWhenEdit="true">
+            <EditTemplate Context="v">
+                <NeedSelect @bind-Value="@v.NeedId" />
+            </EditTemplate>
+        </TableColumn>
+        <TableColumn Text="出售名称" @bind-Field="@context.SupplyName"
+                     IsVisibleWhenAdd="false" IsVisibleWhenEdit="false" />
+        <TableColumn Text="出售" @bind-Field="@context.SupplyId" Visible="false"
+                     IsVisibleWhenAdd="true" IsVisibleWhenEdit="true">
+            <EditTemplate Context="v">
+                <SupplySelect @bind-Value="@v.SupplyId" />
+            </EditTemplate>
+        </TableColumn>
+        <TableColumn Text="交易员" @bind-Field="@context.TraderName"
+                     IsVisibleWhenAdd="false" IsVisibleWhenEdit="false" />
+        <TableColumn Text="交易员" @bind-Field="@context.TraderId" Visible="false"
+                     IsVisibleWhenAdd="true" IsVisibleWhenEdit="true">
+            <EditTemplate Context="v">
+                <TraderSelect @bind-Value="@v.TraderId" />
+            </EditTemplate>
+        </TableColumn>
+        <TableColumn Text="零件" @bind-Field="@context.ComponentName"
+                     IsVisibleWhenAdd="false" IsVisibleWhenEdit="false" />
+        <TableColumn Text="报价" @bind-Field="@context.Price" FormatString="C2" Filterable="true" />
+        <TableColumn Text="数量" @bind-Field="@context.Amount" FormatString="N0" Filterable="true" />
+        <TableColumn Text="顾客意向" @bind-Field="@context.CustomerIntention" Filterable="true">
+            <Template Context="v">
+                @{
+                    var vm = v.Row;
+                    bool showButton = User is Customer && vm.CustomerIntention == null;
+                }
+                @if (showButton)
+                {
+                    <div style="display: flex; justify-content: center; gap: 10px;">
+                        <PopConfirmButton Color="Color.Primary" Text="同意" Size="Size.ExtraSmall"
+                                          OnConfirm="@(() => OnConfirmIntention(vm, true, true))" />
+                        <PopConfirmButton Color="Color.Danger" Text="拒绝" Size="Size.ExtraSmall"
+                                          OnConfirm="@(() => OnConfirmIntention(vm, false, true))" />
+                    </div>
+                }
+                else
+                {
+                    <Button Color="Color.Secondary" Text="@FormatIntention(vm.CustomerIntention)"
+                            Size="Size.ExtraSmall" IsDisabled="true" />
+                }
+            </Template>
+            <EditTemplate Context="v">
+                <NullableBoolSelect @bind-Value="v.CustomerIntention" DisplayText="顾客意向" />
+            </EditTemplate>
+        </TableColumn>
+        <TableColumn Text="供应商意向" @bind-Field="@context.SupplierIntention" Filterable="true">
+            <Template Context="v">
+                @{
+                    var vm = v.Row;
+                    bool showButton = User is Supplier && vm.SupplierIntention == null;
+                }
+                @if (showButton)
+                {
+                    <div style="display: flex; justify-content: center; gap: 10px;">
+                        <PopConfirmButton Color="Color.Primary" Text="同意" Size="Size.ExtraSmall"
+                                          OnConfirm="@(() => OnConfirmIntention(vm, true, false))" />
+                        <PopConfirmButton Color="Color.Danger" Text="拒绝" Size="Size.ExtraSmall"
+                                          OnConfirm="@(() => OnConfirmIntention(vm, false, false))" />
+                    </div>
+                }
+                else
+                {
+                    <Button Color="Color.Secondary" Text="@FormatIntention(vm.SupplierIntention)"
+                            Size="Size.ExtraSmall" IsDisabled="true" />
+                }
+            </Template>
+            <EditTemplate Context="v">
+                <NullableBoolSelect @bind-Value="v.SupplierIntention" DisplayText="供应商意向" />
+            </EditTemplate>
+        </TableColumn>
+        <TableColumn Text="交易操作" @bind-Field="context.Id"
+                     IsVisibleWhenAdd="false" IsVisibleWhenEdit="false">
+            <Template Context="v">
+                @{
+                    var vm = v.Row;
+                    bool canTrade = vm.CustomerIntention == true && vm.SupplierIntention == true;
+                }
+                <div style="display: flex; justify-content: center; gap: 10px;">
+                    @if (vm.TraderIntention == null)
+                    {
+                        @if (User is Trader or Administrator)
+                        {
+                            @if (canTrade)
+                            {
+                                <Button Color="Color.Primary" Text="发起协议" Size="Size.ExtraSmall"
+                                        OnClick="@(() => NewAgreement(vm))" />
+                            }
+                            else
+                            {
+                                <Button Color="Color.Secondary" Text="不可发起协议" Size="Size.ExtraSmall"
+                                        IsDisabled="true" />
+                            }
+                            <PopConfirmButton Color="Color.Danger" Text="放弃建议" Size="Size.ExtraSmall"
+                                              OnConfirm="@(() => CancelSuggest(vm))" />
+                        }
+                        else
+                        {
+                            <Button Color="Color.Secondary" Text="等待交易员操作" Size="Size.ExtraSmall"
+                                    IsDisabled="true" />
+                        }
+                    }
+                    else if (vm.TraderIntention == true)
+                    {
+                        <Button Color="Color.Secondary" Text="已发起协议" Size="Size.ExtraSmall" IsDisabled="true" />
+                    }
+                    else if (vm.TraderIntention == false)
+                    {
+                        <Button Color="Color.Secondary" Text="已放弃建议" Size="Size.ExtraSmall" IsDisabled="true" />
+                    }
+                </div>
+            </Template>
+        </TableColumn>
+    </TableColumns>
+</Table>
+
+<Modal @ref="Modal">
+    <ModalDialog Title="发起协议" IsCentered="true">
+        <BodyTemplate>
+            <ValidateForm Model="@Agreement">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <BootstrapInput DisplayText="名称" @bind-Value="@Agreement.Name" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <BootstrapInput DisplayText="报价" Value="@($"{TradeSuggestVM.Price:C2}")" IsDisabled="true" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <BootstrapInput DisplayText="数量" Value="@($"{TradeSuggestVM.Amount:N0}")" IsDisabled="true" />
+                    </div>
+                </div>
+            </ValidateForm>
+        </BodyTemplate>
+        <FooterTemplate>
+            <Button Text="确定" Icon="fa-regular fa-square-check" OnClick="@OnModalConfirm" />
+        </FooterTemplate>
+    </ModalDialog>
+</Modal>

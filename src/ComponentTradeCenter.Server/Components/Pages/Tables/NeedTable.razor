@@ -1,0 +1,44 @@
+﻿@page "/need-table"
+@layout MainLayout
+@inherits EntityTablePageBase<NeedVM>
+@implements IEditableTablePage<NeedVM>
+@using ComponentTradeCenter.Server.Data.Base
+@using ComponentTradeCenter.Server.Data.Model
+@using ComponentTradeCenter.Server.Data.ViewModel
+@using ComponentTradeCenter.Server.Components.Base
+@using ComponentTradeCenter.Server.Components.Selects
+
+<PageTitle>收购信息</PageTitle>
+
+<Table TItem="NeedVM" class="table-demo" PageItemsSource="@PageItemsSource"
+       IsPagination="true" IsStriped="true" IsBordered="true" IsMultipleSelect="true"
+       ShowAdvancedSearch="false" ShowToolbar="true" ShowSearch="true" 
+       ShowExportPdfButton="true" ShowExportButton="true"
+       ShowAddButton="@IsAddable" ShowEditButton="@IsEditable" ShowDeleteButton="@IsDeleteable"
+       OnQueryAsync="@OnQueryAsync" OnAddAsync="@OnAddAsync"
+       OnDeleteAsync="@OnDeleteAsync" OnSaveAsync="@OnSaveAsync">
+
+    <TableColumns>
+        <TableColumn Text="ID" @bind-Field="@context.Id" Formatter="@(GetModelCustomId<Need>)"
+                     Searchable="true" IsVisibleWhenEdit="false" IsVisibleWhenAdd="false" />
+        <TableColumn Text="名称" @bind-Field="@context.Name" Searchable="true" />
+        <TableColumn Text="顾客" @bind-Field="@context.CustomerName" Searchable="true"
+                     IsVisibleWhenEdit="false" IsVisibleWhenAdd="false" />
+        <TableColumn Text="顾客" @bind-Field="@context.CustomerId" Visible="false">
+            <EditTemplate Context="v">
+                <CustomerSelect @bind-Value="@v.CustomerId" />
+            </EditTemplate>
+        </TableColumn>
+        <TableColumn Text="零件" @bind-Field="@context.ComponentName" Searchable="true"
+                     IsVisibleWhenEdit="false" IsVisibleWhenAdd="false" />
+        <TableColumn Text="零件" @bind-Field="@context.ComponentId" Visible="false"
+                     IsVisibleWhenEdit="true" IsVisibleWhenAdd="true">
+            <EditTemplate Context="v">
+                <ComponentSelect @bind-Value="@v.ComponentId" />
+            </EditTemplate>
+        </TableColumn>
+        <TableColumn Text="预算" @bind-Field="@context.Price" FormatString="C2" Filterable="true" />
+        <TableColumn Text="数量" @bind-Field="@context.Amount" FormatString="N0" Filterable="true" />
+    </TableColumns>
+
+</Table>

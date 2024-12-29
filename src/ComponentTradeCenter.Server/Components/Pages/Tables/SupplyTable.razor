@@ -1,0 +1,43 @@
+﻿@page "/supply-table"
+@layout MainLayout
+@inherits EntityTablePageBase<SupplyVM>
+@implements IEditableTablePage<SupplyVM>
+@using ComponentTradeCenter.Server.Data.Base
+@using ComponentTradeCenter.Server.Data.Model
+@using ComponentTradeCenter.Server.Data.ViewModel
+@using ComponentTradeCenter.Server.Components.Base
+@using ComponentTradeCenter.Server.Components.Selects
+
+<PageTitle>出售信息</PageTitle>
+
+<Table TItem="SupplyVM" class="table-demo" PageItemsSource="@PageItemsSource"
+       IsPagination="true" IsStriped="true" IsBordered="true" IsMultipleSelect="true" 
+       ShowAdvancedSearch="false" ShowToolbar="true" ShowSearch="true"
+       ShowExportPdfButton="true" ShowExportButton="true"
+       ShowAddButton="@IsAddable" ShowEditButton="@IsEditable" ShowDeleteButton="@IsDeleteable"
+       OnQueryAsync="@OnQueryAsync" OnAddAsync="@OnAddAsync"
+       OnDeleteAsync="@OnDeleteAsync" OnSaveAsync="@OnSaveAsync">
+
+    <TableColumns>
+        <TableColumn Text="ID" @bind-Field="@context.Id" Formatter="@(GetModelCustomId<Supply>)"
+                     Searchable="true" IsVisibleWhenEdit="false" IsVisibleWhenAdd="false" />
+        <TableColumn Text="名称" @bind-Field="@context.Name" Searchable="true" />
+        <TableColumn Text="供应商" @bind-Field="@context.SupplierName" Searchable="true"
+                     IsVisibleWhenEdit="@CanSelectSupplier" IsVisibleWhenAdd="@CanSelectSupplier">
+            <EditTemplate Context="v">
+                <SupplierSelect @bind-Value="@v.SupplierId" />
+            </EditTemplate>
+        </TableColumn>
+        <TableColumn Text="零件" @bind-Field="@context.ComponentName" Searchable="true"
+                     IsVisibleWhenEdit="false" IsVisibleWhenAdd="false" />
+        <TableColumn Text="零件" @bind-Field="@context.ComponentId" Visible="false"
+                     IsVisibleWhenEdit="true" IsVisibleWhenAdd="true">
+            <EditTemplate Context="v">
+                <ComponentSelect @bind-Value="@v.ComponentId" />
+            </EditTemplate>
+        </TableColumn>
+        <TableColumn Text="报价" @bind-Field="@context.Price" FormatString="C2" Filterable="true" />
+        <TableColumn Text="数量" @bind-Field="@context.Amount" FormatString="N0" Filterable="true" />
+    </TableColumns>
+
+</Table>

@@ -1,0 +1,45 @@
+﻿@page "/trade-table"
+@layout MainLayout
+@inherits EntityTablePageBase<TradeVM>
+@implements IEditableTablePage<TradeVM>
+@using ComponentTradeCenter.Server.Data.Model
+@using ComponentTradeCenter.Server.Data.ViewModel
+@using ComponentTradeCenter.Server.Components.Base
+@using ComponentTradeCenter.Server.Components.Selects
+
+<PageTitle>交易记录</PageTitle>
+
+<Table TItem="TradeVM" class="table-demo" PageItemsSource="@PageItemsSource"
+       IsPagination="true" IsStriped="true" IsBordered="true" IsMultipleSelect="true" 
+       ShowAdvancedSearch="false" ShowToolbar="true" ShowSearch="true"
+       ShowExportButton="true" ShowExportPdfButton="true"
+       ShowAddButton="@IsAddable" ShowEditButton="@IsEditable" ShowDeleteButton="@IsDeleteable"
+       OnQueryAsync="@OnQueryAsync" OnAddAsync="@OnAddAsync"
+       OnDeleteAsync="@OnDeleteAsync" OnSaveAsync="@OnSaveAsync">
+
+    <TableColumns>
+        <TableColumn Text="ID" @bind-Field="@context.Id" Formatter="@(GetModelCustomId<Trade>)"
+                     Searchable="true" Readonly="true" IsVisibleWhenEdit="false" IsVisibleWhenAdd="false" />
+        <TableColumn Text="名称" @bind-Field="@context.Name" Searchable="true" />
+        <TableColumn Text="协议" @bind-Field="@context.AgreementId" Visible="false"
+                     IsVisibleWhenAdd="true" IsVisibleWhenEdit="true">
+            <EditTemplate Context="v">
+                <AgreementSelect @bind-Value="@v.AgreementId" />
+            </EditTemplate>
+        </TableColumn>
+        <TableColumn Text="需求名称" @bind-Field="@context.NeedName"
+                     IsVisibleWhenAdd="false" IsVisibleWhenEdit="false" />
+        <TableColumn Text="供应名称" @bind-Field="@context.SupplyName"
+                     IsVisibleWhenAdd="false" IsVisibleWhenEdit="false" />
+        <TableColumn Text="交易员" @bind-Field="@context.TraderName"
+                     IsVisibleWhenAdd="false" IsVisibleWhenEdit="false" />
+        <TableColumn Text="零件" @bind-Field="@context.ComponentName"
+                     IsVisibleWhenAdd="false" IsVisibleWhenEdit="false" />
+        <TableColumn Text="成交价" @bind-Field="@context.Price" FormatString="C2"
+                     IsVisibleWhenAdd="false" IsVisibleWhenEdit="false" />
+        <TableColumn Text="数量" @bind-Field="@context.Amount" FormatString="N0"
+                     IsVisibleWhenAdd="false" IsVisibleWhenEdit="false" />
+        <TableColumn Text="交易时间" @bind-Field="@context.CompleteTime" FormatString="yyyy/MM/dd HH:mm:ss" />
+    </TableColumns>
+
+</Table>

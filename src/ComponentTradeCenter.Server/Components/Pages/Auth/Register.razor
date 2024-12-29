@@ -1,0 +1,30 @@
+﻿@page "/register"
+@layout LoginLayout
+@using ComponentTradeCenter.Server.Data.Base
+
+<div class="login-item login-item-avatar text-center">
+    <div class="text-center">
+        <Avatar Url="./images/component.png" IsCircle="true" Size="Size.ExtraExtraLarge" />
+        <h4 class="text-dark">注册用户</h4>
+    </div>
+    <ValidateForm Model="@Model" OnValidSubmit="@OnValidRegister">
+        <Select TValue="int" ShowLabel="false" @bind-Value="@Model.UserType">
+            <Options>
+                <SelectOption Text="顾客" Value="0" Active="true" />
+                <SelectOption Text="供应商" Value="1" />
+                <SelectOption Text="交易员" Value="2" />
+                <SelectOption Text="管理员" Value="3" />
+            </Options>
+            <DisplayTemplate>
+                <i class="fa-solid fa-user"></i>
+                <span>@context?.Text</span>
+            </DisplayTemplate>
+        </Select>
+        <BootstrapInput TValue="string" ShowLabel="false" PlaceHolder="请输入用户名" @bind-Value="@Model.UserName" />
+        <BootstrapPassword ShowLabel="false" PlaceHolder="请输入密码" @bind-Value="@Model.Password" />
+        <BootstrapPassword ShowLabel="false" PlaceHolder="请确认密码" @bind-Value="@Model.ConfirmedPassword" />
+        <Button Text="注册" ButtonType="@ButtonType.Submit" Color="Color.Primary" />
+        <hr />
+        <Button Text="返回登录" ButtonType="@ButtonType.Button" Color="Color.Info" OnClick="@GoToLogin" />
+    </ValidateForm>
+</div>

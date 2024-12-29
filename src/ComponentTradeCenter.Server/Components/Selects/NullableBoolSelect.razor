@@ -1,0 +1,40 @@
+﻿<RadioList @bind-Value="@InternalValue" IsButton="true" DisplayText="@DisplayText" Items="@SelectedItems" />
+
+@code {
+    [Parameter]
+    public bool? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<bool?> ValueChanged { get; set; }
+
+    [Parameter]
+    public string? DisplayText { get; set; }
+
+    public static List<SelectedItem> SelectedItems => new List<SelectedItem>()
+    {
+        new SelectedItem("空", "空"),
+        new SelectedItem("是", "是"),
+        new SelectedItem("否", "否"),
+    };
+
+    protected string InternalValue
+    {
+        get => Value switch
+        {
+            null => "空",
+            true => "是",
+            false => "否",
+        };
+        set
+        {
+            Value = value switch
+            {
+                "空" => null,
+                "是" => true,
+                "否" => false,
+                _ => throw new ArgumentException(),
+            };
+            ValueChanged.InvokeAsync(Value);
+        }
+    }
+}

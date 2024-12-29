@@ -1,0 +1,29 @@
+﻿@page "/component-table"
+@layout MainLayout
+@inherits ModelTablePageBase<Component>
+@implements IEditableTablePage<Component>
+@using ComponentTradeCenter.Server.Data.Base
+@using ComponentTradeCenter.Server.Components
+@using ComponentTradeCenter.Server.Components.Base
+@using Component = ComponentTradeCenter.Server.Data.Model.Component
+
+<PageTitle>零件信息</PageTitle>
+
+<Table TItem="Component" class="table-demo" PageItemsSource="@PageItemsSource"
+       IsPagination="true" IsStriped="true" IsBordered="true" IsMultipleSelect="true"
+       ShowAdvancedSearch="false" ShowToolbar="true" ShowSearch="true" ShowExportButton="true"
+       ShowExportPdfButton="true" ShowAddButton="@IsAddable"
+       ShowEditButton="@IsEditable" ShowDeleteButton="@IsDeleteable"
+       OnQueryAsync="@OnQueryAsync" OnAddAsync="@OnAddAsync"
+       OnDeleteAsync="@OnDeleteAsync" OnSaveAsync="@OnSaveAsync">
+
+    <TableColumns>
+        <TableColumn Text="ID" @bind-Field="@context.Id" Formatter="@(GetModelCustomId<Component>)"
+                     Searchable="true" Readonly="true" IsVisibleWhenEdit="false" IsVisibleWhenAdd="false" />
+        <TableColumn Text="名称" @bind-Field="@context.Name" Searchable="true" />
+        <TableColumn Text="颜色" @bind-Field="@context.Color" Filterable="true" />
+        <TableColumn Text="重量(g)" @bind-Field="@context.Weight" FormatString="N2" Filterable="true" Searchable="true" />
+        <TableColumn Text="简介" @bind-Field="@context.Brief" Searchable="true" />
+    </TableColumns>
+
+</Table>

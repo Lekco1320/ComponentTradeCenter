@@ -1,0 +1,29 @@
+﻿@page "/login"
+@layout LoginLayout
+@using ComponentTradeCenter.Server.Data.Base
+
+<div class="login-item login-item-avatar text-center">
+    <div class="text-center">
+        <Avatar Url="./images/component.png" IsCircle="true" Size="Size.ExtraExtraLarge" />
+        <h4 class="text-dark">欢迎使用零件交易平台</h4>
+    </div>
+    <ValidateForm Model="@Model" OnValidSubmit="@OnLoginSuccess">
+        <Select TValue="int" ShowLabel="false" @bind-Value="@Model.ModelType">
+            <Options>
+                <SelectOption Text="顾客" Value="0" Active="true" />
+                <SelectOption Text="供应商" Value="1" />
+                <SelectOption Text="交易员" Value="2" />
+                <SelectOption Text="管理员" Value="3" />
+            </Options>
+            <DisplayTemplate>
+                <i class="fa-solid fa-user"></i>
+                <span>@context?.Text</span>
+            </DisplayTemplate>
+        </Select>
+        <BootstrapInput TValue="string" ShowLabel="false" PlaceHolder="请输入用户名" @bind-Value="@Model.UserName" />
+        <BootstrapPassword ShowLabel="false" PlaceHolder="请输入密码" @bind-Value="@Model.Password" />
+        <Button Text="登录" ButtonType="ButtonType.Submit" Color="Color.Danger"></Button>
+        <hr />
+        <Button Text="用户注册" Color="Color.Info" OnClick="@OnRegister"></Button>
+    </ValidateForm>
+</div>

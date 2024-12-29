@@ -1,0 +1,9 @@
+* text=auto
+
+*.sln    merge=binary
+*.csproj merge=binary
+*.jpg    binary
+*.png    binary
+*.gif    binary
+*.docx   diff=astextplain
+*.sql    linguist-language=SQL

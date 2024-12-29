@@ -1,0 +1,13 @@
+﻿@inherits EntityInfoBase<Trader>
+@using ComponentTradeCenter.Server.Components.Base
+@using ComponentTradeCenter.Server.Data.Model
+
+<div class="dropdown-item-demo">
+    <div class="select-custom-header">
+        <div class="id">@Value?.CustomId</div>
+        <div class="name">@Value?.Name</div>
+    </div>
+    <div class="select-custom-body">
+        <div>@($"电话：{Format(Value?.Phone)}")</div>
+    </div>
+</div>
