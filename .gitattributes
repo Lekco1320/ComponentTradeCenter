@@ -6,4 +6,6 @@
 *.png    binary
 *.gif    binary
 *.docx   diff=astextplain
-*.sql    linguist-language=SQL
+*.razor  linguist-language=C#
+*.sql    linguist-detectable=true
+*.sql    linguist-language=sql
